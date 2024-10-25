@@ -1,30 +1,28 @@
 # 100 Days Of Code - Log
 
-### Day 0: February 30, 2016 (Example 1)
-##### (delete me or comment me out)
+## Day 1: October 24, 2024
 
-**Today's Progress**: Fixed CSS, worked on canvas functionality for the app.
+#### Today's Progress
 
-**Thoughts:** I really struggled with CSS, but, overall, I feel like I am slowly getting better at it. Canvas is still new for me, but I managed to figure out some basic functionality.
+1. Created my GitHub Profile page
+2. Revisited building prototypes using Xcode's Interface Builder and faking implementation
+   details using animations.
 
-**Link to work:** [Calculator App](http://www.example.com)
+#### Thoughts on GitHub Profile pages
 
-### Day 0: February 30, 2016 (Example 2)
-##### (delete me or comment me out)
+I enjoyed creating my GitHub Profile page. Writing copy takes way more brain power than I
+expected it would—just thinking about word choice and the different tones they evoke.
 
-**Today's Progress**: Fixed CSS, worked on canvas functionality for the app.
+#### Thoughts on Prototyping
 
-**Thoughts**: I really struggled with CSS, but, overall, I feel like I am slowly getting better at it. Canvas is still new for me, but I managed to figure out some basic functionality.
+I’m currently implementing a vertically sliced spike of my weather app, Maeve, in order to get
+a minimum viable product (MVP) up and running as quickly as possible. My focus is on designing
+the user interface and simulating expected features so that I can dedicate the bulk of my time
+implementing niche features that will attract users. For instance, I can use animations and
+static data to mimic loading weather data from a remote API, but then actually implement
+whatever needs to be implemented to have it tell the user what to wear that day.
 
-**Link(s) to work**: [Calculator App](http://www.example.com)
+#### Link to work
 
-
-### Day 1: June 27, Monday
-
-**Today's Progress**: I've gone through many exercises on FreeCodeCamp.
-
-**Thoughts** I've recently started coding, and it's a great feeling when I finally solve an algorithm challenge after a lot of attempts and hours spent.
-
-**Link(s) to work**
-1. [Find the Longest Word in a String](https://www.freecodecamp.com/challenges/find-the-longest-word-in-a-string)
-2. [Title Case a Sentence](https://www.freecodecamp.com/challenges/title-case-a-sentence)
+- [My GitHub Profile Page](https://github.com/webdavis/webdavis)
+- [Maeve](https://github.com/webdavis/Maeve)
