@@ -32,16 +32,25 @@ whatever needs to be implemented to have it tell the user what to wear that day.
 #### Today's Progress
 
 1. Created a Bento profile.
-1. Practiced implementing dependency diagrams.
-1. Implemented a module-based dependency diagram for Maeve.
+2. Practiced implementing dependency diagrams.
+3. Implemented a module-based dependency diagram for Maeve.
 
 #### Thoughts on Architecture
 
-Since Maeve’s current implementation is a vertically sliced spike, I’ll keep it as a monolith.
-However, I can still maintain a logical separation of concerns through folder organization,
-treating folders as “virtual modules”, so to speak. Since this is a spike, I can skip test
-implementation, which allows me to avoid the delays caused by the simulator booting up with
-UIKit.
+For this round I'm implementing a vertically sliced spike so that I know what is and isn't
+possible for this app.
+
+As a result, I won't be test-driving it. That's actually beneficial here because for UI modules
+Xcode boots the simulator every time tests are run, which makes development painfully slow.
+(Not writing tests avoids that 🤣.)
+
+↕️  Since it's a vertical slice, a monolithic architecture makes the most sense.
+
+💡 However, that doesn't mean I won't attempt to make thoughtful architectural decisions.
+
+Even though the code won't be divided into separate physical modules, I can still organize
+concerns using folders and treat them as "virtual modules." For example, `<Weather Service>` is
+a clear boundary that facilitates communication between the other modules.
 
 #### Link to work
 
