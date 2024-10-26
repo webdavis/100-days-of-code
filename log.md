@@ -1,5 +1,15 @@
 # 100 Days Of Code - Log
 
+- [Day 1: October 24, 2024](#day-1-october-24-2024)
+  - [Today's Progress](#todays-progress)
+  - [Thoughts on GitHub Profile pages](#thoughts-on-github-profile-pages)
+  - [Thoughts on Prototyping](#thoughts-on-prototyping)
+  - [Link to work](#link-to-work)
+- [Day 2: October 25, 2024](#day-2-october-25-2024)
+  - [Today's Progress](#todays-progress-1)
+  - [Thoughts on Architecture](#thoughts-on-architecture)
+  - [Link to work](#link-to-work-1)
+
 ## Day 1: October 24, 2024
 
 ### Today's Progress
@@ -32,8 +42,8 @@ whatever needs to be implemented to have it tell the user what to wear that day.
 ### Today's Progress
 
 1. Created a Bento profile.
-2. Practiced implementing dependency diagrams.
-3. Implemented a module-based dependency diagram for Maeve.
+1. Practiced implementing dependency diagrams.
+1. Implemented a module-based dependency diagram for Maeve.
 
 ### Thoughts on Architecture
 
