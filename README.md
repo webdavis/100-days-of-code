@@ -1,6 +1,8 @@
 # I've joined the #100DaysOfCode Challenge
 
-Check out my [Log](log.md) to see my progress!
+✍🏼 Check out my [Log](log.md) to see my progress!
+
+Or follow along on my Twitter／X 👉🏼 [@webdavisio](https://x.com/webdavisio)
 
 ## Contents
 
