@@ -66,3 +66,67 @@ a clear boundary that facilitates communication between the other modules.
 
 - [My Bento Profile](https://bento.me/webdavis)
 - [Add module-based dependency diagram as SVG](https://github.com/webdavis/Maeve/commit/2290ab56eaf22adbc116bbb7bade15fd024a177b)
+
+## Day 1 (Restarting): January 10, 2025
+
+### Today's Progress
+
+1. I went back through the first few lectures from the Networking Module on iOS Lead
+   Essentials. I took notes on the following concepts:
+   - TDD: Start by Testing Initialization
+   - Tests Should Start and End in a Clean State
+   - Protocols／Interfaces Begin as Guidelines
+   - Locating-Clients-in-Memory versus Being-Given-a-Client
+   - Test Spies Should Track Message Values, Invocation Count, and Order
+   - Mixing Stubbing and Capturing Values: A Code Smell
+   - Refactoring an Array to a Computed Property
+   - Designing Better Code with Enums: Make Invalid Paths Non-Representable
+
+### Locating-Clients-in-Memory versus Being-Given-a-Client
+
+Making HTTP clients Singletons／singletons (lowercase "s") is an anti-pattern.
+
+Using HTTP clients as Singletons means the client is globally _located in memory_, making it
+accessible throughout the system. This creates `hidden dependencies` that are hard to track,
+as different parts of the system can interact with the client in unpredictable ways. Managing
+its state and behavior becomes challenging as the system grows.
+
+In contrast, _being given a client_—by injecting it—provides explicit control over where and
+how it’s created and used. This approach improves maintainability, testability, and clarity, as
+dependencies are clear and easier to manage. By avoiding Singletons, we make the system more
+predictable and manageable.
+
+#### How this relates to the Open/Closed Principle
+
+The Open/Closed Principle (OCP) states that software should be **open for extension** but
+**closed for modification**.
+
+Using HTTP clients as Singletons can violate this principle because it introduces hidden
+dependencies and tightly couples components to the client. This makes it difficult to extend or
+modify behavior without altering the global state or the parts of the system relying on it.
+
+By injecting clients, you allow the system to be _open for extension_—new behavior can be
+introduced by providing different implementations of the client without changing existing code.
+
+When you inject a client into a component, you’re giving that component the ability to interact
+with the client without tightly coupling it to a specific instance. This means you can change
+which client the component uses (for example, switching from a `ClientSpy` in tests to a real
+HTTP `Client` in production) without needing to change the component itself.
+
+So, *closed for modification* means you don’t need to alter the component’s code to change its
+behavior (like switching clients). You only need to modify the **client** or how you provide
+it, not the component that uses it.
+
+This makes the code:
+
+- **More flexible:** because you can swap out implementations.
+- **More maintainable:** because the components don’t need updates when clients change
+- **Easier to test:** because you can inject mock clients or different implementations without
+  touching the component itself.
+
+In short, injecting clients lets you extend the system (by adding new clients) without changing
+existing code, which is exactly what the Open/Closed Principle advocates.
+
+### Link to work
+
+- [GitHub: webdavis/essential-feed-case-study](https://github.com/webdavis/essential-feed-case-study)
