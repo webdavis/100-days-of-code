@@ -130,3 +130,28 @@ existing code, which is exactly what the Open/Closed Principle advocates.
 ### Link to work
 
 - [GitHub: webdavis/essential-feed-case-study](https://github.com/webdavis/essential-feed-case-study)
+
+## Day 2: January 12, 2025
+
+### Today's Progress
+
+1. I reviewed a particularly difficult lecture from the iOS Lead
+   Essentials Networking module. I found the following topics interesting:
+   - Behaviors that should be verified when TDDing HTTP Clients
+   - Adding Tests Might NOT Alter Production Code
+   - How to Represent an Empty JSON List as a String
+   - Using `reduce` to Remove `nil` Values from a dictionary, `compactMapValues` can do the
+     same thing with less code
+   - Implementing `Decodable` can Implicitly Couple Modules
+
+### Implementing Decodable can Implicitly Couple Modules
+
+Implementing `Decodable` directly on our Interface/Boundary model may unintentionally couple
+our API module to other modules, such as the caching or database module.
+
+To prevent this, we can map the API model to the interface model within the API module itself.
+This keeps each module independent and avoids leaking implementation details.
+
+### Link to work
+
+- [GitHub: webdavis/essential-feed-case-study: Commit 695abde](https://github.com/webdavis/essential-feed-case-study/commit/695abdebf667e9839c09303ab3dc8dae1a4d9740)
