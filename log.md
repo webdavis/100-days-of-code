@@ -155,3 +155,140 @@ This keeps each module independent and avoids leaking implementation details.
 ### Link to work
 
 - [GitHub: webdavis/essential-feed-case-study: Commit 695abde](https://github.com/webdavis/essential-feed-case-study/commit/695abdebf667e9839c09303ab3dc8dae1a4d9740)
+
+## Day 3: January 14, 2025
+
+### Today's Progress
+
+1. Wrapped my head around protocols, closures, and delegates.
+
+### Protocols/Closures are Behavioral Contracts and Delegates Decouple the Class from the Behavior
+
+Let's make it make sense!
+
+Functions are Closures, and Closures are Unnamed Functions.
+
+Here is a function:
+
+```swift
+func convertStringToInt(_ text: String) -> Int {
+    guard let number = Int(text) else {
+        fatalError("'\(text)' is not a valid number.")
+    }
+    return number
+}
+```
+
+What is the signature of this function? 🤔
+
+The signature is `(String) -> Int`.
+
+Now let's define a closure that does the same thing:
+
+```swift
+func convertStringToInt: (String) -> Int = { text in
+    guard let number = Int(string) else {
+        fatalError("'\(string)' is not a valid number.")
+    }
+    return number
+}
+```
+
+What's the signature of this closure?
+
+Again, the signature is `(String) -> Int`.
+
+So they do exactly the same thing, but they just look a little different.
+
+🤔 What do they have in common?
+
+The signature!
+
+What's another way to pass around a signature?
+
+By using a protocol!
+
+```swift
+protocol StringToInt {
+    func convert(_ text: String) -> Int
+}
+```
+
+Protocols are just closures. If we need a contract that requires more than one behavior, then
+it may make more sense to use one protocol with two functions instead of two separate closures.
+It's really just a preference 🤷.
+
+Now, how does all of this relate to Delegates?
+
+Well, Delegates are just protocols or closures. They are an abstraction on a client, so that we
+can extend it's functionality. If we want the client to have a different behavior, then we just
+implement the protocol or closure.
+
+Apple uses delegates to extend the functionality of it's view controllers.
+
+View controller's have views, and those views have delegates and datasources in the form of
+protocols.
+
+For example, `UIKit.UITableViewController` comes with a `UITableView` property, and
+`UITableView` includes a DataSource／Delegate.
+
+Without it, a view controller's behavior would always be fixed!
+
+Apple implemented this pattern to allow us to customize a view controller’s behavior. By
+_implementing_ the DataSource／Delegate, we can define exactly how it should function. In other
+words, it's a *boundary for behavior*.
+
+If we want to add more behavior to the view controller then we just add another another adapter
+that implements the delegate:
+
+```swift
+// MARK: - Custom DataSource
+class TableViewDataSource: NSObject, UITableViewDataSource {
+  let data: [String]
+  
+  init(data: [String]) {
+    self.data = data
+  }
+
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return data.count
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+    cell.textLabel?.text = data[indexPath.row]
+    return cell
+  }
+}
+
+// MARK: - Custom Delegate
+class TableViewDelegate: NSObject, UITableViewDelegate {
+  weak var dataSource: TableViewDataSource?
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let data = dataSource?.data, indexPath.row < data.count else {
+      print("Invalid selection.")
+      return
+    }
+    print("Selected: \(data[indexPath.row])")
+    tableView.deselectRow(at: indexPath, animated: true)
+  }
+}
+
+// MARK: - Client Class
+class YourCustomTableViewController: UITableViewController {
+  var tableViewDataSource: TableViewDataSource?
+  var tableViewDelegate: TableViewDelegate?
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    tableView.dataSource = tableViewDataSource
+    tableView.delegate = tableViewDelegate
+    tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+  }
+}
+```
+
+> This is the **Open／Closed Principle (OCP)** in action! We don't have to change the view
+> controller to extend it's behavior.
