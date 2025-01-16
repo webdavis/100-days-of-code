@@ -292,3 +292,41 @@ class YourCustomTableViewController: UITableViewController {
 
 > This is the **Open／Closed Principle (OCP)** in action! We don't have to change the view
 > controller to extend it's behavior.
+
+## Day 4: January 15, 2025
+
+### Today's Progress
+
+1. Reviewed a particularly difficult topic on using generics to map `Swift.Error` types to
+   domain-specific typed errors. Going to have to come up with a decent spike to drive this one
+   home in my brain.
+1. Did some research on when to write _more_ end-to-end tests.
+
+### When to Write More End-To-End Tests
+
+The less we trust a counterpart (e.g., APIs, remote servers, databases, file systems, etc.),
+the more we should rely on end-to-end tests to increase confidence and reduce risks.
+
+**How do rely more on end-to-end tests?** Simply put, by writing more of them.
+
+For example, let's say our app relies on a remote API service (like a Weather API), and the
+service owners introduce breaking changes in their next update and fail to warn us.
+
+Full stop, if this is the case, then we should be looking for a new API. If our app is designed
+to be composable, replacing the API shouldn't be too difficult.
+
+However, if replacing the API isn't possible, then we can mitigate this issue by adding more
+end-to-end tests.
+
+### What are End-to-End Tests?
+
+These are tests that check our system against other services, like remote APIs. In end-to-end
+tests we hit the database and the real services that our app uses.
+
+End-to-end tests verify our app against external services, such as remote APIs, databases, or
+file systems. These tests interact with real counterparts to ensure the app behaves as expected
+in a production-like environment.
+
+For example, we make a real network request to that Weather API using a real instance of
+`URLSession` and then check that the weather data returned by the API maps onto our model
+objects exactly how we expect them to.
