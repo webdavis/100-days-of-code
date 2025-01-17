@@ -330,3 +330,58 @@ in a production-like environment.
 For example, we make a real network request to that Weather API using a real instance of
 `URLSession` and then check that the weather data returned by the API maps onto our model
 objects exactly how we expect them to.
+
+## Day 5: January 16, 2025
+
+### Today's Progress
+
+1. Learned about `Swift.Error`, including error handling in Swift, as well as generics.
+
+### Handling Errors by Converting them to Optional Values
+
+Converting an error to an optional value is a great way to handle situations where we want to
+throw our domain-specific error in favor of a third-party error that we don't control (e.g.
+`DecodingError` thrown by `JSONDecoder.decode(_:from:)`).
+
+Take a look at the following `static` function. Why isn't there a `do-catch` block to catch the
+potential error that **`JSONDecoder().decode(_:from:)`** throws?
+
+```swift
+  internal static func map(_ data: Data, from response: URLResponse) -> RemoteFeedLoader.Result {
+    guard response.statusCode == OK_200, let root = try? JSONDecoder().decode(Root.self, from: data) else {
+      return .failure(.invalidData)
+    }
+
+    return .success(root.feed)
+  }
+```
+
+This is because Swift allows us to convert errors to optional values.
+
+If `decode` throws an error it's converted to an optional value **`nil`**.
+
+Here is what the Apple docs say about it:
+
+> "You use `try?` to handle an error by converting it to an optional value. If an error is
+> thrown while evaluating the `try?` expression, the value of the expression is `nil`."
+
+We could convert this to a `do-catch` block and implement the same behavior, like so:
+
+```swift
+  internal static func map(_ data: Data, from response: URLResponse) -> RemoteFeedLoader.Result {
+    let root: FeedItemsMapper.Root?
+    do {
+      root = try JSONDecoder().decode(Root.self, from: data)
+    } catch {
+      root = nil
+    }
+    guard response.statusCode == OK_200, root != nil else {
+      return .failure(.invalidData)
+    }
+
+    return .success(root!.feed)
+  }
+```
+
+We could do this, but it seems kinda convoluted. Maybe that's why the Swift team implemented
+this.
