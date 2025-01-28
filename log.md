@@ -385,3 +385,186 @@ We could convert this to a `do-catch` block and implement the same behavior, lik
 
 We could do this, but it seems kinda convoluted. Maybe that's why the Swift team implemented
 this.
+
+## Day 6: January 27, 2025
+
+### Today's Progress
+
+1. Learned how the compiler auto-synthesizes `enum` conformance to `Equatable`.
+
+### Compiler Magic: Automatic Conformance to Equatable
+
+Take a look at the following code:
+
+```swift
+/////////////////////
+// MARK: - Production
+/////////////////////
+import Foundation
+
+public struct FeedItem: Equatable {
+  public let id: UUID
+  public let description: String?
+  public let location: String?
+  public let imageURL: URL
+  
+  public init(id: UUID, description: String?, location: String?, imageURL: URL) {
+    self.id = id
+    self.description = description
+    self.location = location
+    self.imageURL = imageURL
+  }
+}
+
+public enum LoadFeedResult<Error: Swift.Error> {
+  case success([FeedItem])
+  case failure(Error)
+}
+
+//extension LoadFeedResult: Equatable where Error: Equatable {}
+
+protocol FeedLoader {
+  associatedtype Error: Swift.Error
+
+  func load(completion: @escaping (LoadFeedResult<Error>) -> Void)
+}
+
+public final class RemoteFeedLoader: FeedLoader {
+  private let client: HTTPClient
+  private let url: URL
+
+  public enum Error: Swift.Error {
+    case connectivity
+    case invalidData
+  }
+  
+  public typealias Result = LoadFeedResult<Error>
+  
+  public init(url: URL, client: HTTPClient) {
+    self.url = url
+    self.client = client
+  }
+  
+  public func load(completion: @escaping (Result) -> Void) {
+    client.get(from: url) { [weak self] result in
+      guard self != nil else { return }
+      
+      switch result {
+      case let .success(data, response):
+        completion(FeedItemsMapper.map(data, from: response))
+      case .failure:
+        completion(.failure(.connectivity))
+      }
+    }
+  }
+}
+
+/////////////////////
+// MARK: - Test Class
+/////////////////////
+class RemoteFeedLoaderTests: XCTestCase {
+
+  //...
+
+  private func expect(_ sut: RemoteFeedLoader, toCompleteWith result: RemoteFeedLoader.Result, when action: () -> Void, file: StaticString = #file, line: UInt = #line) {
+    var capturedResults = [RemoteFeedLoader.Result]()
+    sut.load { capturedResults.append($0) }
+    
+    action()
+    
+    XCTAssertEqual(capturedResults, [result], file: file, line: line)
+  }
+
+  //...
+}
+```
+
+If we comment out the `extension` that conforms `LoadFeedResult` to `Equatable` if `Error` is
+`Equatable` (as depicted below), then Swift gives us the following error:
+
+```swift
+// extension LoadFeedResult: Equatable where Error: Equatable {}
+```
+
+```
+Global function 'XCTAssertEqual(_:_:_:file:line:)' requires that 'RemoteFeedLoader.Result' (aka
+'LoadFeedResult<RemoteFeedLoader.Error>') conform to 'Equatable'
+
+! Requirement from conditional conformance of '[RemoteFeedLoader.Result]' (aka
+'Array<LoadFeedResult<RemoteFeedLoader.Error>>') to 'Equatable' (Swift.Array)
+```
+
+The problem is that in order to be able to compare the two `LoadFeedResult` instances, the
+`Error` type passed to `LoadFeedResult` must conform to `Equatable`.
+
+#### Understanding How Error Conforms to Equatable
+
+If we look at `LoadFeedResult`:
+
+```swift
+public enum LoadFeedResult<Error: Swift.Error> {
+  case success([FeedItem])
+  case failure(Error)
+}
+```
+
+##### The success Case
+
+The `success` case has an associated value of `[FeedItem]`, which is an array. Arrays conform
+to `Equatable` only if their elements conform to `Equatable`, and in this case `FeedItem` does
+conform to `Equatable`.
+
+##### The failure Case
+
+The `failure` case has an associated value of `Error`. Therefore, `Error` must conform to
+`Equatable` for the failure case to satisfy `Equatable`.
+
+If `Error` in our production code doesn’t conform to `Equatable`, the conditional conformance
+can’t be satisfied. In this case we have the following solutions:
+
+1. We can either make `Error` conform to `Equatable` (if it makes sense for our domain logic), or
+2. We must use a custom equality check in our test instead of relying on `XCTAssertEqual`.
+
+> **Tip**: Solution **2** is ultimately the solution we end up going with so that we don't
+> alter our production code just for the sake of tests. That's bad practice!
+
+#### The Fix
+
+In `RemoteFeedLoader` we declare `RemoteFeedLoader.Error` like so:
+
+```swift
+public enum Error: Swift.Error {
+  case connectivity
+  case invalidData
+}
+```
+
+Enums without associated values can automatically conform to `Equatable`. This is because there
+are no additional types (like `String`, `Int`, etc.) in the `enum` cases to complicate the
+equality check. The compiler synthesizes the `Equatable` conformance by comparing the enum
+cases directly.
+
+For example:
+
+```swift
+let error1: RemoteFeedLoader.Error = .connectivity
+let error2: RemoteFeedLoader.Error = .connectivity
+XCTAssertEqual(error1, error2)
+```
+
+Thus, when we uncomment the extension:
+
+```swift
+extension LoadFeedResult: Equatable where Error: Equatable {}
+```
+
+The compiler checks whether `RemoteFeedLoader.Error` conforms to `Equatable`. Since the enum
+has no associated values and satisfies the rules for automatic synthesis, the compiler deems it
+`Equatable`. This enables `LoadFeedResult<RemoteFeedLoader.Error>` to conform to `Equatable`.
+
+#### In Summary
+
+The compiler isn’t “synthesizing `Error` to `Equatable`” — it’s using automatic synthesis
+because our `RemoteFeedLoader.Error` enum meets the criteria for `Equatable`. By uncommenting
+the extension, we enable the compiler to extend `LoadFeedResult` with `Equatable` conformance,
+leveraging the `Equatable` status of both `FeedItem` and `RemoteFeedLoader.Error`.
